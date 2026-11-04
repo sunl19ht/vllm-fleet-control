@@ -1,0 +1,40 @@
+# macOS 与 IDE
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# 本地配置与凭据
+.env
+.env.*
+!.env.example
+.envrc
+secrets/
+.ssh/
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+application-local.*
+application-*.local.*
+
+# 前端依赖与构建产物
+node_modules/
+.pnpm-store/
+dist/
+*.tsbuildinfo
+
+# 后端构建产物
+target/
+.m2/
+
+# 日志、测试报告与本地数据
+*.log
+logs/
+coverage/
+deploy/data/
+deploy/volumes/
