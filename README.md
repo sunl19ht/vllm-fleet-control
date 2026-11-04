@@ -5,7 +5,7 @@
 ## 当前状态
 
 M0 工程初始化阶段，尚未发布可用版本。
-当前仅建立仓库结构，前后端及数据库尚未初始化。
+后端已通过基础构建、应用上下文测试与最小 API 验收；前端、数据库和 CI 尚未初始化，M0 尚未完成。
 
 ## 技术方向
 
@@ -14,7 +14,14 @@ M0 工程初始化阶段，尚未发布可用版本。
 - 数据库：PostgreSQL、Flyway
 - 容器环境：独立 Fedora 主机上的 Podman
 
-具体工程依赖将在后续初始化时验证并锁定。
+后端已验证 Spring Boot 4.1.2、JDK 21 与 Maven 3.10.0；Maven 版本由 Wrapper 固定，Spring Boot 版本由后端 pom.xml 固定。其他组件将在接入时验证并锁定。
+
+## 开发入口
+
+- [后端构建、启动与接口检查](backend/README.md)
+- [已验证的环境版本](docs/ENVIRONMENT.md)
+- [验收结果与未验证项](docs/ACCEPTANCE.md)
+- [开发文档索引](docs/README.md)
 
 ## 目录
 
