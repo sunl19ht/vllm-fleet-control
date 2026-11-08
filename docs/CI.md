@@ -25,7 +25,17 @@ CI 的数据库地址和凭据只属于当前临时服务，任务结束后销�
 
 在 GitHub 仓库的 Actions 页面打开对应提交的 `CI` 运行，确认 `Backend checks` 和 `Frontend checks` 都通过，再将运行链接、提交号和结果补入 `docs/ACCEPTANCE.md`。
 
-首次编写工作流时仅完成静态检查；GitHub 实际运行成功前，不应记录为 CI 已通过。
+### 已验证运行
+
+2026-11-08（Asia/Shanghai），助手读取 GitHub 页面确认：
+
+| 触发方式 | 对应提交或 PR | 结果 | 运行记录 |
+| --- | --- | --- | --- |
+| 分支推送 | `771c1ab` | 后端、前端均通过 | [CI #1](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484589906) |
+| Pull Request | PR #4 | 成功 | [CI #2](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484729548) |
+| main 合并后推送 | `90ebdee` | 成功 | [CI #3](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484779661) |
+
+PR #4 已合并。结果依据 GitHub 页面状态和已提交的工作流；未下载完整作业日志。详细验收边界见 [验收记录](ACCEPTANCE.md)。
 
 该流程覆盖干净检出的构建、空库迁移、后端测试和打包启动。浏览器交互、SSH 隧道、仓库 Compose 配置的全新部署仍需按相关文档分别验收。
 
