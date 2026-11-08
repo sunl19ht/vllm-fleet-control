@@ -5,12 +5,12 @@
 ## 当前状态
 
 M0 工程初始化阶段，尚未发布可用版本。
-后端最小 API、远端 PostgreSQL 连接与 Flyway 首次及重复迁移检查已通过；前端和 CI 尚未初始化，M0 尚未完成。
+后端、数据库迁移及 Vue 前端的真实 API 联调已通过；前端类型检查与生产构建已验证，CI 与干净环境复现仍待完成，M0 尚未完成。
 
 ## 技术方向
 
 - 后端：JDK 21、Spring Boot、Maven
-- 前端：Vue 3、TypeScript、Element Plus、pnpm
+- 前端：Vue 3、TypeScript、shadcn/vue、Tailwind CSS、pnpm
 - 数据库：PostgreSQL、Flyway
 - 容器环境：独立 Fedora 主机上的 Podman
 
@@ -19,6 +19,8 @@ M0 工程初始化阶段，尚未发布可用版本。
 ## 开发入口
 
 - [后端构建、启动与接口检查](backend/README.md)
+- [前端安装、构建与联调](frontend/README.md)
+- [前端 UI 选型记录](docs/decisions/0001-frontend-ui.md)
 - [数据库与迁移说明](docs/DATABASE.md)
 - [已验证的环境版本](docs/ENVIRONMENT.md)
 - [验收结果与未验证项](docs/ACCEPTANCE.md)
