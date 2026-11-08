@@ -1,7 +1,7 @@
 # 开发环境
 
 更新日期：2026-11-08（Asia/Shanghai）。仅记录脱敏后的开发环境信息。
-执行结果依据 Owner 提供的终端和 IDEA 日志；助手已核对当前工程配置，未代替 Owner 执行远端操作。
+证据来自 Owner 的终端日志、页面截图与确认，以及助手的临时前端构建和 IDEA 配置恢复验证；各项来源在验收记录中分开说明。
 
 ## Mac 开发机
 
@@ -12,10 +12,26 @@
 | JDK | Homebrew OpenJDK 21.0.13.0.3 | Maven 与 IDEA 日志；pom.xml 目标为 Java 21 |
 | Spring Boot | 4.1.2 | pom.xml 父工程与启动日志 |
 | Maven / Wrapper | 3.10.0 / 3.3.4 | Wrapper 配置与构建日志 |
-| Node.js / npm | 24.22.2 / 11.19.1 | Owner 的版本检查；前端构建尚未验证 |
-| pnpm | 11.25.0 | Owner 的版本检查；前端构建尚未验证 |
+| Node.js / npm | 24.22.2 / 11.19.1 | Owner 的版本检查；前端临时构建使用 Node.js 24 |
+| pnpm | 11.25.0 | Owner 安装及构建日志；packageManager 固定版本 |
 
 后端构件版本为 0.0.1-SNAPSHOT。构建入口为 ./mvnw。
+
+## 前端组件与构建
+
+| 组件 | 实际安装版本 | 来源 |
+| --- | --- | --- |
+| Vue | 3.5.45 | 安装日志与本机依赖清单 |
+| Vite | 8.3.6 | 安装及构建日志 |
+| TypeScript / vue-tsc | 6.0.3 / 3.3.14 | 安装日志与本机依赖清单 |
+| Tailwind CSS / @tailwindcss/vite | 4.3.5 / 4.3.5 | package.json 与本机依赖清单 |
+| Reka UI | 2.11.0 | 安装日志与本机依赖清单 |
+| Lucide（@lucide/vue） | 1.70.0 | 本机依赖清单 |
+
+shadcn/vue 使用生成后纳入 Git 的组件源码，选项保存在 components.json：New York、Neutral、Geist、Lucide。
+包依赖由 pnpm-lock.yaml 定位，pnpm 使用 packageManager 固定为 11.25.0。
+当前不再使用 Element Plus，选型变更见 [决策记录](decisions/0001-frontend-ui.md)。
+前端通过 127.0.0.1:5173 的 /api 代理访问后端 127.0.0.1:8080。
 
 ## 数据库与持久化组件
 
@@ -45,7 +61,7 @@ Flyway 和 JDBC 版本由 Spring Boot 4.1.2 管理；MyBatis-Plus 显式固定�
 
 - 按仓库 Compose 示例在干净环境部署、数据卷恢复及备份流程。
 - MyBatis-Plus 的实际 Mapper 查询、参数校验和业务事务。
-- 前端工程、锁文件、类型检查、构建与真实 API 调用。
+- 前端在 CI 与干净环境中的冻结锁文件安装、构建及生产反向代理。
 - CI 使用独立数据库服务的构建与迁移检查。
 - Router 的项目与 API 能力，以及 vLLM、Prometheus、systemd 的实际集成。
 
