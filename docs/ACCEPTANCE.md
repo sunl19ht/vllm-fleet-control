@@ -108,7 +108,7 @@ Owner 在已设置该变量的终端执行 ./mvnw -B -V verify，最终日志结
 - 验证日期：2026-11-08。
 - 分支：feat/frontend-bootstrap，基于 main 合并提交 1f9b467。
 - Owner 确认 UI 方案由 Element Plus 改为 shadcn/vue + Tailwind CSS，记录于 [前端 UI 决策](decisions/0001-frontend-ui.md)。
-- 本记录随前端实现提交；提交与合并状态以 Git 历史为准。
+- 代码提交 `3b774ca`；PR #3 已合并，main 合并提交为 `cfe64d7`。
 
 ### 构建证据
 
@@ -143,10 +143,68 @@ Owner 提供了页面截图，展示真实 API 响应：
 - 最小页面只验证管理 API 可达性；应用标识与阶段是后端工程元数据，不是数据库或 vLLM 的持续健康探测。
 - 当前没有自动化前端单元测试或端到端测试。
 - Node 依赖目录、dist 及 IDEA 私有配置已检查忽略规则，密码不写入记录。
-- CI、干净环境复现、生产反向代理、移动端独立验收和字体离线部署尚未完成。
+- 本节为 Issue #04 时的证据；后续 CI 与干净检出构建已在 Issue #05 验证，见后文。
+- 开发启动与页面断开恢复的后续验证见 Issue #05。仓库 Compose 的全新部署、生产反向代理、移动端独立验收和字体离线部署仍未完成。
 
-结论：前端基础组件、类型检查、生产构建和真实 API 页面联调已验证，异常与恢复由 Owner 人工确认；代码提交和合并进度以 Git 为准。
+结论：前端基础组件、类型检查、生产构建和真实 API 页面联调已验证，异常与恢复由 Owner 人工确认；代码已通过 PR #3 合并。
+
+## Issue #05：CI 与本地开发说明
+
+- 验证日期：2026-11-08。
+- 分支：`ci/m0-checks`；代码提交 `771c1ab`。
+- [PR #4](https://github.com/sunl19ht/vllm-fleet-control/pull/4) 已合并，main 合并提交为 `90ebdee`。
+- 助手核对本地 main 已同步上述合并提交，工作区干净；此状态对应本次收尾文档修改之前。
+- 新增统一的 [开发启动步骤](DEVELOPMENT.md)，自动检查配置见 [CI 说明](CI.md)。
+
+### 自动检查证据
+
+助手读取 GitHub 页面，确认以下运行成功：
+
+| 运行 | 对象 | 结果 |
+| --- | --- | --- |
+| [CI #1](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484589906) | 分支提交 `771c1ab` | 后端 51 秒、前端 21 秒，均成功；总耗时 56 秒 |
+| [CI #2](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484729548) | PR #4 | 成功，总耗时 51 秒 |
+| [CI #3](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484779661) | main 提交 `90ebdee` | 成功，总耗时 51 秒 |
+
+PR 页面显示 4 项检查通过；推送与 PR 事件各自触发前后端检查，不代表有 4 种不同测试。
+
+依据成功状态和工作流内容，本次检查覆盖：
+
+- Ubuntu 托管运行器干净检出代码，后端以 JDK 21 和 Maven Wrapper 执行 verify。
+- 现有应用上下文测试连接临时 PostgreSQL 空库并执行 Flyway 迁移。
+- 测试结束后启动打包 JAR，检查 health 为 UP、应用标识正确且 stage 为非空字符串。
+- 再次启动后查询迁移历史，成功的 V1 记录恰好一条。
+- 前端以固定 Node.js、packageManager 指定的 pnpm 执行冻结锁文件安装、类型检查和生产构建。
+
+以上结果来自 GitHub 页面，未下载完整作业日志；CI 使用独立临时库，不代表 Fedora 现有部署或仓库 Compose 全新部署得到再次验证。
+
+### 本地开发链路复现
+
+- 执行日期：2026-11-08；分支 `docs/m0-acceptance`，基于 main 的 `90ebdee`。本次只调整文档，应用代码沿用该基线。
+- Owner 在已设置数据库变量的终端执行 verify，第一次在 21:29:32 因 127.0.0.1:15432 connection refused 失败。
+- SSH 隧道恢复后，Owner 提供 21:31:57 和 21:32:29 两次 BUILD SUCCESS 日志；以最后一次记录结果：测试 1 项，失败 0、错误 0、跳过 0，可执行 JAR 打包完成。
+- 最后一次日志显示 Hikari 连接 PostgreSQL 17.11，Flyway 成功校验 1 个迁移，public schema 版本为 1，No migration necessary。
+- 助手读取本机监听信息，确认 SSH 15432、Java 8080 和 Vite 5173 均有进程监听；随后从浏览器读取后端 health，结果为 UP。
+- 助手在旧 Vite 服务看到 .vue 解析错误，且 /api 没有按预期代理；磁盘配置已包含 Vue 插件和代理。Owner 重启旧 Vite 后，助手再次读取页面和代理响应，均恢复正常。
+- 21:36:54，页面显示已连接、vllm-fleet-control、M0；助手点击重新检查后，最近检查时间更新为 21:36:59。
+- 助手从浏览器访问 5173/api/v1/system/info，实际读取到 application 为 vllm-fleet-control、stage 为 M0 的 JSON。未将浏览器结果描述为本轮 Owner curl 状态码日志。
+- Owner 随后确认完成后端停止、页面重新检查显示错误、后端重启及页面恢复已连接的人工流程。此项依据 Owner 确认，未保存独立失败状态截图，未记为自动化端到端测试。
+- 本轮未另收到 Mac 上前端冻结安装与构建的完整日志；对应检查以 main 的 CI 结果为证据。启动复现复用现有 Fedora 数据库，未重建数据卷。
+
+### 已接受的跳过项与后续范围
+- Issue #01 的独立手工克隆检查仍按 Owner 决定跳过，不补记为通过；CI 的干净检出单独记录。
+- 仓库 Compose 的全新部署、备份恢复、生产代理及 vLLM 业务接入均未由本次 CI 覆盖。
+
+结论：Issue #05 的 CI 与开发链路验收通过；开发启动、排障与验收文档已整理于本次收尾变更中。
 
 ## M0 总体状态
 
-尚未完成。后端、数据库迁移与前端基础联调已验证，下一项为 Issue #05：CI 与干净环境复现。
+M0 基础工程验收通过。证据包括：
+
+- 仓库结构与安全忽略规则、后端固定构建入口和最小 API。
+- PostgreSQL 连接、V1 首次迁移及重复启动校验。
+- Vue 前端真实 API 调用、页面重新检查，以及 Owner 确认的断开恢复。
+- CI 对干净检出的前后端构建、临时空库迁移和后端打包启动的检查。
+- 当前 Mac 与 Fedora 开发链路复现，以及遇到问题的恢复步骤。
+
+完成结论限定于上述 M0 范围。Owner 跳过的独立手工克隆项保持原记录；仓库 Compose 的全新部署、备份恢复、生产方案、业务鉴权与资源管理，以及 vLLM 集成均未据此记为通过。许可证仍待 Owner 确认，尚未发布版本。下一阶段按执行手册从 M1 管理员登录与鉴权开始。

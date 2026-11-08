@@ -68,7 +68,7 @@ IDEA 启动时需在该应用的运行配置 Environment variables 中单独设�
 ```
 
 首次运行会下载 Maven 与依赖。当前应用上下文测试会连接真实开发数据库，并由 Flyway 执行尚未应用的迁移；运行前应确认连接的是开发库。
-本次流程不是无需数据库的离线单元测试。CI 独立测试数据库将在 Issue #05 配置。
+本地流程需要可连接的开发数据库。GitHub CI 使用独立的临时 PostgreSQL，已通过测试、空库迁移、打包启动及 API 检查，见 [CI 说明](../docs/CI.md)。
 
 首次运行会应用 V1，后续启动会校验迁移历史并保持版本 1。迁移规则见 [数据库说明](../docs/DATABASE.md)。
 打包产物为 target/fleet-control-backend-0.0.1-SNAPSHOT.jar，不纳入 Git。
@@ -94,7 +94,7 @@ curl -i http://127.0.0.1:8080/actuator/health
 
 - 信息接口仍返回静态的 application 与 stage，不能作为数据库查询验证。
 - Actuator 仅开放 health，健康明细设置为 never。
-- Issue #02 已验证上述两个 HTTP 接口；Issue #03 的证据是数据库连接、迁移和应用上下文测试，尚未补交接入数据库后的 HTTP 请求结果。
+- Issue #04 已补充接入数据库后的 health 请求，结果为 UP；Issue #05 的 CI 也已检查上述两个接口，证据见 [验收记录](../docs/ACCEPTANCE.md)。
 - 应用健康状态不能代表 Router 或 vLLM 已接入或健康。
 
 详见 [环境记录](../docs/ENVIRONMENT.md)、[验收记录](../docs/ACCEPTANCE.md) 和 [开发数据库部署说明](../deploy/README.md)。

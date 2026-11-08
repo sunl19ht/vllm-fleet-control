@@ -1,7 +1,7 @@
 # 开发环境
 
 更新日期：2026-11-08（Asia/Shanghai）。仅记录脱敏后的开发环境信息。
-证据来自 Owner 的终端日志、页面截图与确认，以及助手的临时前端构建和 IDEA 配置恢复验证；各项来源在验收记录中分开说明。
+证据来自 Owner 的终端日志、页面截图与确认、助手的临时前端构建与 IDEA 配置恢复验证，以及 GitHub Actions 的运行结果；各项来源在验收记录中分开说明。
 
 ## Mac 开发机
 
@@ -57,12 +57,28 @@ Flyway 和 JDBC 版本由 Spring Boot 4.1.2 管理；MyBatis-Plus 显式固定�
 - Fedora 端发布地址为 127.0.0.1:5432；Mac 不要求安装本地 Podman。
 - 容器版本、就绪检查和数据库运行状态依据 Owner 提供的输出，未在此验证第三方镜像与官方镜像的内容一致性。
 
+## GitHub CI
+
+- 工作流：`.github/workflows/ci.yml`，Ubuntu 24.04 GitHub 托管运行器。
+- 后端配置：Temurin JDK 21、项目 Maven Wrapper、独立 PostgreSQL `17.11-bookworm` 服务。
+- 前端配置：Node.js 24.22.2，pnpm 从 packageManager 读取为 11.25.0，冻结锁文件安装。
+- 2026-11-08，main 合并提交 `90ebdee` 的 [CI 运行](https://github.com/sunl19ht/vllm-fleet-control/actions/runs/42484779661) 成功。
+- 以上工具版本为工作流配置；未单独读取托管运行器的完整版本日志，不将其等同于 Mac 本机 JDK 补丁版本。
+- 覆盖干净检出后的构建、测试、空库迁移、后端打包启动和基础 API，不连接 Fedora。
+
+## M0 本地收尾验证
+
+- 2026-11-08，Owner 恢复 SSH 隧道后在 Mac 完成后端 verify；最终日志结束时间为 21:32:29 +08:00，BUILD SUCCESS，测试 1 项，失败、错误和跳过均为 0。
+- 日志显示连接 PostgreSQL 17.11，Flyway 校验 1 个迁移，schema 为版本 1，无需再次迁移。
+- 助手读取浏览器页面，确认后端 health 为 UP；重启旧 Vite 进程后，前端页面与 /api 代理恢复正常，并验证重新检查会更新时间。
+- Owner 随后确认停止后端、页面显示错误、重启后端及页面恢复连接的人工检查完成。
+- 本次复用现有 Fedora 开发库；前端冻结锁文件安装和构建的独立复现证据来自 CI，未另收到本轮 Mac 前端构建的完整日志。
+
 ## 待验证
 
 - 按仓库 Compose 示例在干净环境部署、数据卷恢复及备份流程。
 - MyBatis-Plus 的实际 Mapper 查询、参数校验和业务事务。
-- 前端在 CI 与干净环境中的冻结锁文件安装、构建及生产反向代理。
-- CI 使用独立数据库服务的构建与迁移检查。
+- 前端生产反向代理与生产运行方案。
 - Router 的项目与 API 能力，以及 vLLM、Prometheus、systemd 的实际集成。
 
 不在本文件记录真实密码、SSH 私钥或远端服务地址。
